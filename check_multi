@@ -1,0 +1,80 @@
+#!/usr/bin/perl -w
+use strict;
+use Getopt::Long;
+
+my $plugindir = '/usr/lib/nagios/plugins/';
+my $cfgfile = $plugindir.'check_multi.cfg'; 
+my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+
+my %Opts;
+GetOptions(\%Opts, 'exec|e=s', 'help|h', 'warn|w=s', 'crit|c=s', 'warnascrit|A',
+);
+my $exec = $Opts{'exec'};
+my $warn = $Opts{'warn'};
+my $crit = $Opts{'crit'};
+my $help = $Opts{'help'};
+my $warnascrit = $Opts{'warnascrit'};
+
+#validate requests and inputs
+my $usage = "Usage: check_multi -e <full subcheck with args> -h -w <warnlevel> -c <critlevel> \n Warn and Crit are the number of failures to tolerate in terms of nodes, subcheck is full nagios check syntax\n"; 
+if ($help) { die $usage };
+die $usage unless ($warn && $crit && $exec);
+
+#Open the config file if present, read in ignoring comments and whitespace.
+die "Cannot open config file $cfgfile\n" unless ( open (IN, $cfgfile) );
+my @nodes;
+while ( <IN> ){
+	s/#.*//;
+	next if /^(\s)*$/;
+	chomp;
+	push @nodes, $_;
+}
+close IN;
+
+my ($sres, $wres, $cres) = getres(\@nodes);
+
+#Check for warnascrit flag, and combine warning and crits for that case
+if ( $warnascrit ){
+	$cres += $wres;
+}
+#Debug
+#print "\n Results: \n Success: $sres \n Warning: $wres \n Failure: $cres\n";
+
+#Determine our exit status
+my ( $state, $msg);
+if ( $cres >= $crit ){
+	$state = $ERRORS{'CRITICAL'};
+	$msg = "$cres failures out of $crit threshold level";
+}
+elsif ( $wres >= $warn ){
+	$state = $ERRORS{'WARNING'};
+	$msg = "$wres warnings out of $warn threshold level";
+}
+else {
+	$state = $ERRORS{'OK'};
+	$msg = "$sres successful checks out of ". ($#nodes + 1) . "\n";
+}
+
+print $msg;
+exit $state;	
+
+#man sub to get the check results for each host in the config file
+sub getres{
+	my ($nodes) = @_;
+	#set indexes to zero
+	my ($res, $wres, $cres, $sres) = (0) x 4;
+	foreach my $node (@$nodes){
+		my $cmd = $exec;
+		#replace each host with ones from the file.
+		$cmd =~ s/HOST/$node/;
+		#actually execute in the shell
+		qx($cmd);
+		#shift by 8 to get shell result from wait() to look right
+		$res = $? >> 8;
+		if ($res == 0) { $sres++ };
+		if ($res == 1) { $wres++ };
+		if ($res == 2) { $cres++ };
+	}
+	return ($sres, $wres, $cres);
+}
+
