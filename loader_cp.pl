@@ -3,11 +3,16 @@ use strict;
 use warnings;
 use DBI;
 
+my $sth;
 our $dbh = DBI->connect("DBI:mysql:database=cp;host=localhost", 'root', 'power')
 	 || die "could not connect to DB: $DBI::errstr";
 
+#Create some user accounts
+$sth=$dbh->prepare("INSERT INTO users (username, password) VALUES (?,MD5(?))");
+$sth->execute('slackey', 'password');
+
 # create the 3 resource types
-my $sth=$dbh->prepare("INSERT INTO resource_type (resource_type_name, tcpip_based, requires_agent, standard_port) VALUES (?,?,?,?)");
+$sth=$dbh->prepare("INSERT INTO resource_type (resource_type_name, tcpip_based, requires_agent, standard_port) VALUES (?,?,?,?)");
 $sth->execute('mysql', '1', '1', '3306');
 $sth->execute('storage', '1', '0', '');
 $sth->execute('memcached', '1', '0', '11211');

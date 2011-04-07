@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS users (
+  user_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  username varchar(16),
+  password varchar(32),
+  unique (user_id),
+  index (username)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS osimage (
   osimage_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
   distro varchar(256),
