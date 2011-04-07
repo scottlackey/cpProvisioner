@@ -15,3 +15,11 @@ $sth->execute('memcached', '1', '0', '11211');
 #create a resource server for mysql, server size is number of mysql instances available, usage is how many mysql images are deployed
 $sth=$dbh->prepare("INSERT INTO resourceserver (hostname, osimage_id, resource_type_id, resource_version_id, server_size, server_usage, is_live, is_allocating) VALUES (?,?,?,?,?,?,?,?)");
 $sth->execute('localhost', '1', '1', '1', '2', '0', '1', '1');
+
+#create a resource server for storage, server size is MB of storage, I guess
+$sth=$dbh->prepare("INSERT INTO resourceserver (hostname, osimage_id, resource_type_id, resource_version_id, server_size, server_usage, is_live, is_allocating) VALUES (?,?,?,?,?,?,?,?)");
+$sth->execute('localhost', '1', '2', '1', '2', '0', '1', '1');
+
+#create a resource server for memcached, server size is MB of memcache available and server_usage is MB used.
+$sth=$dbh->prepare("INSERT INTO resourceserver (hostname, osimage_id, resource_type_id, resource_version_id, server_size, server_usage, is_live, is_allocating) VALUES (?,?,?,?,?,?,?,?)");
+$sth->execute('localhost', '1', '3', '1', '2', '0', '1', '1');
