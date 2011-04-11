@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS user (
   user_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
   username varchar(16),
   password varchar(32),
