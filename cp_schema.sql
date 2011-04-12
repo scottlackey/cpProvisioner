@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS user (
   username varchar(16),
   password varchar(32),
   unique (user_id),
+  unique (username),
   index (username)
 ) ENGINE=InnoDB;
 
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS osimage (
   distro_version varchar(256),
   repo_reference varchar(256),
   unique (osimage_id),
+  unique (distro),
   index (distro),
   index (distro, distro_version)
 ) ENGINE=InnoDB;
@@ -78,6 +80,7 @@ CREATE TABLE IF NOT EXISTS appserver (
   is_live boolean DEFAULT 0,
   is_allocating boolean DEFAULT 0,
   unique (appserver_id),
+  unique (hostname),
   index (osimage_id)
 ) ENGINE=InnoDB;
 
@@ -127,6 +130,7 @@ CREATE TABLE IF NOT EXISTS resource_type (
   requires_agent boolean,
   standard_port smallint unsigned,
   unique (resource_type_id),
+  unique (resource_type_name),
   index (standard_port)
 ) ENGINE=InnoDB;
 
@@ -157,6 +161,7 @@ CREATE TABLE IF NOT EXISTS resourceserver (
   is_live boolean DEFAULT 0,
   is_allocating boolean DEFAULT 0,
   unique (resourceserver_id),
+  unique (hostname),
   index (resource_type_id),
   index (resource_version_id),
   index (osimage_id)

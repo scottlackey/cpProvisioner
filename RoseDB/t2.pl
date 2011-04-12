@@ -14,13 +14,15 @@ my $p = Resourcetype->new(resource_type_name => 'mysql',
 		requires_agent => '1',	
 		standard_port => '3306'
 );
- my $res = Resourcetype::Manager->get_resourcetypes();
- foreach my $r (@$res) {
-	print "\n Resource Type " . $r->resource_type_name . "\n";
-}
-
     print $p->resource_type_name;
 $p->save;
+
+#Manager multiple values
+ my $res = Resourcetype::Manager->get_resourcetypes();
+ foreach my $r (@$res) {
+	print "\n Resource Type " . $r->resource_type_name . $r->resource_type_id . "\n";
+}
+
 
 #Save a value to the DB
 my $su = User->new(username => 'slackey',
