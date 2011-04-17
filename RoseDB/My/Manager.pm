@@ -52,12 +52,12 @@ use base qw(Rose::DB::Object::Manager);
     sub object_class { 'Resourcetype' }
 
     __PACKAGE__->make_manager_methods('resourcetypes');
-package Resourceversion::Manager;
-use base qw(Rose::DB::Object::Manager);
-
-    sub object_class { 'Resourceversion' }
-
-    __PACKAGE__->make_manager_methods('resourceversions');
+#package Resourceversion::Manager;
+#use base qw(Rose::DB::Object::Manager);
+#
+#    sub object_class { 'Resourceversion' }
+#
+#    __PACKAGE__->make_manager_methods('resourceversions');
 package Resourceaccess::Manager;
 use base qw(Rose::DB::Object::Manager);
 
@@ -82,4 +82,10 @@ use base qw(Rose::DB::Object::Manager);
     sub object_class { 'User' }
 
     __PACKAGE__->make_manager_methods('users');
+package Resourceservertypexr::Manager;
+use base qw(Rose::DB::Object::Manager);
+
+    sub object_class { 'Resourceservertypexr' }
+
+    __PACKAGE__->make_manager_methods('resourceservertypexr');
 1;
