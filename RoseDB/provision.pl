@@ -28,12 +28,8 @@ my $threads = '1';
 
 my $as = getAppServer($threads);
 my $ai = createAI($u->user_id);
-addResourceToAI(['mysql', 'memcached'], '1', $user);
+addResourceToAI(['mysql', 'memcached'], $ai, $user);
 my $tp = createTP($ai, $threads, $as);
-
-#attach AI to TP
-#my $ai='1';
-#my $tp='1';
 attachAITP($ai, $tp);
 
 print "APPInstance = $ai, attached to ThreadPack = $tp for user $user with $threads thread(s) on appserver #$as\n";
@@ -59,32 +55,42 @@ $tp->used('1');
 $tp->locked('0');
 $tp->save;
 
-$ai->threads_requested($ai->threads_live + $tp->thread_count);
-$ai->threads_live($ai->threads_live + $tp->thread_count);
+my $totalthreads = $ai->threads_live + $tp->thread_count;
+$ai->threads_requested($totalthreads);
+$ai->threads_live($totalthreads);
 $ai->is_live('1');
 $ai->save;
 }
 
 
-# Finds and locks a give resource_type and returns the resource_id
+# Finds and locks a given resource_type and returns the resource_id
 sub findRes{
-my ($rtype) = shift;
+my $rtype = shift;
 my $resource; #resource object to return the ID of.
+my $found =0; #let us know if no resources were found.
 my $rt = Resourcetype->new(resource_type_name => $rtype);
 unless($rt->load(speculative => 1)) {
       die "No such resourcetype $rtype can be found\n";
     }
-my $res = Resource::Manager->get_resource();
+my $res = Resource::Manager->get_resource( query => [ resource_type_id => $rt->resource_type_id ] );
 foreach my $r (@$res) {
+print "RESOURCE TYPE: $rtype\n";
+print "ID: " . $r->resource_id . "\n";
+print "Version: " . $r->resource_version . "\n";
+
 	if ($r->resource_type_id == $rt->resource_type_id && $r->locked == '0' && $r->used == '0') {
 		$resource = Resource->new(resource_id => $r->resource_id);
 		unless($resource->load(speculative => 1)) {
       			die "No such resource ID " . $r->resource_id . " can be found\n";
     		}
 		$resource->locked('1');
+		$found=1;
 		last;
 	}		
 }
+	unless ($found){ 
+		die "Cannot find unused, unlocked resource of type $rtype\n"; 
+		}
 $resource->save;
 return $resource->resource_id;
 }
@@ -100,6 +106,15 @@ foreach my $each (@$rtypes){
 					     authorizing_account_id => $user,
 			     		     resource_id => $res);
 		$ra->save;
+		#Here we update the resource's table with the userid that now owns it.
+		my $r = Resource->new(resource_id => $res);
+		unless($r->load(speculative => 1)) {
+      			die "No such resource ID " . $r->resource_id . " can be found\n";
+    		}
+		$r->account_id($user);
+		$r->used('1');
+		$r->save;
+		
 print "appinst ID = $ai, accountID = $user, resource_id = $res\n";
 	}
 	else { die " Could not find available resource type $each \n"; }
@@ -123,7 +138,7 @@ return $appserverid;
 
 #assuming a valid AppInstance, Threadcount and AppServer have been defined, make a threadpack
 sub createTP{
-my ($ai, $tc, $as) = shift;
+my ($ai, $tc, $as) = @_;
 my $tp = Threadpack->new(thread_count => $tc,
 			 appinstance_id => $ai,
 			 appserver_id => $ai,
@@ -135,7 +150,7 @@ return $tp->threadpack_id;
 
 #create a new AppInstance and associate it with the userid defined at the command line
 sub createAI{
-my ($uid) = shift;
+my ($uid) = @_;
 my $ai = Appinstance->new(account_id => $uid,
 			  threads_requested => 1
 			  );

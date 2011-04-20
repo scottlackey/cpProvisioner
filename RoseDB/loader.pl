@@ -19,10 +19,12 @@ rserver('localhost', '1', $rtypes);
 
 createresources($rtypes, $servers); 
 createappservers('localhost', '1');
-createuser('slackey');
+createuser('test1');
+createuser('test2');
 #end main
 
 
+##########################################################################################33
 #begin subs
 sub createuser{
 my $un = shift;
@@ -46,19 +48,29 @@ $a->save;
 #WARNING, this function only creates a mysql and memcache resource on the one resourceserer
 sub createresources{
  my ($rtypes, $servers) = @_;
-#this only creates a mysql resource on the one localhost resourceserer
 my $rt = Resourcetype->new(resource_type_name => 'mysql');
 my $rs = Resourceserver->new(hostname => 'localhost');
 $rt->load;
 $rs->load;
+#this creates two mysql resources on the one localhost resourceserer
 my $resource = Resource->new(resource_type_id => $rt->resource_type_id,
 			     resourceserver_id => $rs->resourceserver_id,
 			     resource_version => '5.1'
 			    );
-#this creates only one memcache resource on the one localhost resourceserer
 $resource->save;
+$resource = Resource->new(resource_type_id => $rt->resource_type_id,
+			     resourceserver_id => $rs->resourceserver_id,
+			     resource_version => '5.1'
+			    );
+$resource->save;
+#this creates two memcache resources on the one localhost resourceserer
  $rt = Resourcetype->new(resource_type_name => 'memcached');
  $rt->load;
+ $resource = Resource->new(resource_type_id => $rt->resource_type_id,
+			     resourceserver_id => $rs->resourceserver_id,
+			     resource_version => '1.4.5'
+			    );
+$resource->save;
  $resource = Resource->new(resource_type_id => $rt->resource_type_id,
 			     resourceserver_id => $rs->resourceserver_id,
 			     resource_version => '1.4.5'
@@ -83,7 +95,9 @@ sub rserver{
 	my ($host, $os, $rtypes) = @_;
 
 	my $p = Resourceserver->new(hostname => $host,
-		osimage_id => $os
+		osimage_id => $os,
+		is_live => '1',
+		is_allocating => '1'
 	);
 	print "Resource Server " . $p->hostname . " created\n";
 	$p->save;
