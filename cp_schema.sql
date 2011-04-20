@@ -134,7 +134,8 @@ CREATE TABLE IF NOT EXISTS resource_type (
   index (standard_port)
 ) ENGINE=InnoDB;
 
-/* This table keeps track of things such as the different builds of MySQL */
+/*Incorporated resource_version as a row of resource 4/20/2011 Scott Lackey*/
+/* This table keeps track of things such as the different builds of MySQL 
 CREATE TABLE IF NOT EXISTS resource_version (
   resource_version_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
   resource_version_name varchar(256),
@@ -142,6 +143,7 @@ CREATE TABLE IF NOT EXISTS resource_version (
   unique (resource_version_id),
   index (resource_type_id)
 ) ENGINE=InnoDB;
+*/
 
 /* Tracks the servers providing each type of resource.  Our assumption is that
 /  each server will handle not just a single kind of resource, but a single
@@ -167,6 +169,13 @@ CREATE TABLE IF NOT EXISTS resourceserver (
   index (osimage_id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS resourceserver_type_xr (
+  id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  resourceserver_id int unsigned NOT NULL,
+  resource_type_id int unsigned NOT NULL,
+  index (id),
+) ENGINE=InnoDB;
+
 /* Resources are associated with accounts, rather than with appinstances.  The
 /  relationship between resources and appinstnaces is thought of as a set of
 /  access rules, and tracked in the resourceaccess table.  Note that this table
@@ -178,7 +187,7 @@ CREATE TABLE IF NOT EXISTS resourceserver (
 CREATE TABLE IF NOT EXISTS resource (
   resource_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
   resource_type_id int unsigned NOT NULL,
-  resource_version_id int unsigned NOT NULL,
+  resource_version float NOT NULL,
   account_id int unsigned,
   resourceserver_id int unsigned,
   resourceidentifier int unsigned,
@@ -194,7 +203,7 @@ CREATE TABLE IF NOT EXISTS resource (
   real_port smallint unsigned,
   unique (resource_id),
   index (resource_type_id),
-  index (resource_type_id,resource_version_id),
+  index (resource_type_id,resource_version),
   index (resourceserver_id),
   index (fake_ip, fake_port),
   index (real_ip, real_port)
