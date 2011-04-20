@@ -19,6 +19,16 @@ rserver('localhost', '1', $rtypes);
 
 createresources($rtypes, $servers); 
 createappservers('localhost', '1');
+createuser('slackey');
+#end main
+
+
+#begin subs
+sub createuser{
+my $un = shift;
+my $u = User->new(username => $un);
+$u->save;
+}
 
 sub createappservers{
  my ($name, $os) = @_;

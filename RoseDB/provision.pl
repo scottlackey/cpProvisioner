@@ -23,10 +23,17 @@ my $u = User->new(username => $user);
 unless($u->load(speculative => 1)) {
       die "No such user in DB";
     }
-my $ai = createAI($u->user_id);
-my $tp = createTP($ai, '1');
 
-print "APPInstance = $ai, ThreadPack = $tp\n";
+my $threads = '1';
+#my $ai = createAI($u->user_id);
+#my $tp = createTP($ai, $threads);
+
+#print "APPInstance = $ai, ThreadPack = $tp\n";
+
+#attach AI to TP
+#attachAITP($ai, $tp);
+
+getAppServer($threads);
 
 #end main
 #subs
@@ -36,6 +43,19 @@ sub checkTP{
 my $tc = shift;
 	my $tp = Threadpack->new(thread_count => $tc
 				);
+}
+
+sub getAppServer{
+my $threads = shift;
+
+my $res = Appserver::Manager->get_appserver();
+foreach my $r (@$res) {
+       print "\n Appserver " . $r->hostname . " Thread Count ". $r->thread_count ."\n";
+	if ($r->thread_count - $r->threads_used >= $threads){
+		my $val = $r->thread_count - $r->threads_used ;
+print "value  $val \n";
+		}
+	}
 }
 
 sub createTP{
