@@ -74,10 +74,6 @@ unless($rt->load(speculative => 1)) {
     }
 my $res = Resource::Manager->get_resource( query => [ resource_type_id => $rt->resource_type_id ] );
 foreach my $r (@$res) {
-print "RESOURCE TYPE: $rtype\n";
-print "ID: " . $r->resource_id . "\n";
-print "Version: " . $r->resource_version . "\n";
-
 	if ($r->resource_type_id == $rt->resource_type_id && $r->locked == '0' && $r->used == '0') {
 		$resource = Resource->new(resource_id => $r->resource_id);
 		unless($resource->load(speculative => 1)) {
@@ -114,8 +110,6 @@ foreach my $each (@$rtypes){
 		$r->account_id($user);
 		$r->used('1');
 		$r->save;
-		
-print "appinst ID = $ai, accountID = $user, resource_id = $res\n";
 	}
 	else { die " Could not find available resource type $each \n"; }
 }
