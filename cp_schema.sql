@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS appinstance (
   appinstance_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
   appinstance_name varchar(256),
   account_id int unsigned,
-  threads_requested int unsigned,
-  threads_live int unsigned,
+  threads_requested int unsigned DEFAULT 0,
+  threads_live int unsigned DEFAULT 0,
   appenv_id int unsigned,
   appenv_version_id int unsigned,
   chrootimage_id int unsigned,
@@ -178,9 +178,7 @@ CREATE TABLE IF NOT EXISTS resourceserver_type_xr (
 
 /* Resources are associated with accounts, rather than with appinstances.  The
 /  relationship between resources and appinstnaces is thought of as a set of
-/  access rules, and tracked in the resourceaccess table.  Note that this table
-/  does NOT include resources which have been pre-created but not allocated;
-/  those are in the unused_resource table. */
+/  access rules, and tracked in the resourceaccess table.  
 /* A resourceidentifier is a sort of bucketid within a resourceserver.  It
 /  is unique among resources on that resourceserver, and may correspond to
 /  a TCP port, UID or other system id(s) for that resource. */
