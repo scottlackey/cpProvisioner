@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS resourceserver_type_xr (
   id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
   resourceserver_id int unsigned NOT NULL,
   resource_type_id int unsigned NOT NULL,
-  index (id),
+  index (id)
 ) ENGINE=InnoDB;
 
 /* Resources are associated with accounts, rather than with appinstances.  The
