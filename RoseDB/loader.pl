@@ -1,5 +1,3 @@
-# $URL
-# $Id
 #!/usr/bin/perl 
 use strict;
 use warnings;
