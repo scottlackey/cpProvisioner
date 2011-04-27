@@ -106,11 +106,6 @@ sub rserver{
 		#load each resourceid using its name
 		my $r = Resourcetype->new(resource_type_name => $item);
 		$r->load;
-		#insert new XR record associating this serverid with the resourceid
-		my $xr = Resourceservertypexr->new(resourceserver_id => $p->resourceserver_id,
-						  resource_type_id => $r->resource_type_id
-		); 
-		$xr->save;
 	}
 }
 
