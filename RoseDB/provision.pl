@@ -9,30 +9,30 @@ use My::Manager;
 
 
 my %Opts;
-GetOptions(\%Opts, 'new|n', 'help|h', 'user|u=s',);
+GetOptions(\%Opts, 'new|n', 'help|h', 'account|a=s',);
 my $new = $Opts{'new'};
 my $help = $Opts{'help'};
-my $user = $Opts{'user'};
+my $account = $Opts{'account'};
 
 #validate
-my $usage = "Usage: provision.pl -n -u <username>  (creates new default appinstance)\n";
+my $usage = "Usage: provision.pl -n -a <accountname>  (creates new default appinstance)\n";
 if ($help) { die $usage };
-die $usage unless ($user);
+die $usage unless ($account);
 
-my $u = User->new(username => $user);
+my $u = Account->new(accountname => $account);
 unless($u->load(speculative => 1)) {
-      die "No such user $user can be found\n";
+      die "No such account $account can be found\n";
     }
 
 my $threads = '1';
 
 my $as = getAppServer($threads);
-my $ai = createAI($u->user_id);
-addResourceToAI(['mysql', 'memcached'], $ai, $user);
+my $ai = createAI($u->account_id);
+addResourceToAI(['mysql', 'memcached'], $ai, $account);
 my $tp = createTP($ai, $threads, $as);
 attachAITP($ai, $tp);
 
-print "APPInstance = $ai, attached to ThreadPack = $tp for user $user with $threads thread(s) on appserver #$as\n";
+print "APPInstance = $ai, attached to ThreadPack = $tp for account $account with $threads thread(s) on appserver #$as\n";
 
 #end main
 #subs
@@ -93,21 +93,21 @@ return $resource->resource_id;
 
 #adds a list of resourcetypes to an appinstance by updating the ResourceAccess table
 sub addResourceToAI{
-my ($rtypes, $ai, $user) = @_;
+my ($rtypes, $ai, $account) = @_;
 foreach my $each (@$rtypes){ 
 	print " Allocating resourcetype: $each \n"; 
 	my $res = findRes($each);
 	if ($res){
 		my $ra = Resourceaccess->new(appinstance_id => $ai,
-					     authorizing_account_id => $user,
+					     authorizing_account_id => $account,
 			     		     resource_id => $res);
 		$ra->save;
-		#Here we update the resource's table with the userid that now owns it.
+		#Here we update the resource's table with the accountid that now owns it.
 		my $r = Resource->new(resource_id => $res);
 		unless($r->load(speculative => 1)) {
       			die "No such resource ID " . $r->resource_id . " can be found\n";
     		}
-		$r->account_id($user);
+		$r->account_id($account);
 		$r->used('1');
 		$r->save;
 	}
@@ -142,7 +142,7 @@ $tp->save;
 return $tp->threadpack_id;
 }
 
-#create a new AppInstance and associate it with the userid defined at the command line
+#create a new AppInstance and associate it with the accountid defined at the command line
 sub createAI{
 my ($uid) = @_;
 my $ai = Appinstance->new(account_id => $uid,

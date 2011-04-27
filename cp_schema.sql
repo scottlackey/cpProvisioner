@@ -1,10 +1,10 @@
-CREATE TABLE IF NOT EXISTS user (
-  user_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  username varchar(16),
+CREATE TABLE IF NOT EXISTS account (
+  account_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  accountname varchar(16),
   password varchar(32),
-  unique (user_id),
-  unique (username),
-  index (username)
+  unique (account_id),
+  unique (accountname),
+  index (accountname)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS osimage (
@@ -208,7 +208,6 @@ CREATE TABLE IF NOT EXISTS resourceaccess (
   resource_id int unsigned NOT NULL,
   appinstance_id int unsigned NOT NULL,
   authorizing_account_id int unsigned,
-  authorizing_user_id int unsigned,
   date_access_granted datetime,
   unique (resourceaccess_id),
   index (resource_id),

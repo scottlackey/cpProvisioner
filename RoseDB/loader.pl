@@ -19,16 +19,16 @@ rserver('localhost', '1', $rtypes);
 
 createresources($rtypes, $servers); 
 createappservers('localhost', '1');
-createuser('test1');
-createuser('test2');
+createaccount('test1');
+createaccount('test2');
 #end main
 
 
 ##########################################################################################33
 #begin subs
-sub createuser{
+sub createaccount{
 my $un = shift;
-my $u = User->new(username => $un);
+my $u = Account->new(accountname => $un);
 $u->save;
 }
 
