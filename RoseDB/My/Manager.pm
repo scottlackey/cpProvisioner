@@ -82,10 +82,4 @@ use base qw(Rose::DB::Object::Manager);
     sub object_class { 'User' }
 
     __PACKAGE__->make_manager_methods('users');
-package Resourceservertypexr::Manager;
-use base qw(Rose::DB::Object::Manager);
-
-    sub object_class { 'Resourceservertypexr' }
-
-    __PACKAGE__->make_manager_methods('resourceservertypexr');
 1;
