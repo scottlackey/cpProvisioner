@@ -76,16 +76,10 @@ use base qw(Rose::DB::Object::Manager);
     sub object_class { 'Threadpack' }
 
     __PACKAGE__->make_manager_methods('threadpacks');
-package User::Manager;
+package Account::Manager;
 use base qw(Rose::DB::Object::Manager);
 
-    sub object_class { 'User' }
+    sub object_class { 'Account' }
 
-    __PACKAGE__->make_manager_methods('users');
-package Resourceservertypexr::Manager;
-use base qw(Rose::DB::Object::Manager);
-
-    sub object_class { 'Resourceservertypexr' }
-
-    __PACKAGE__->make_manager_methods('resourceservertypexr');
+    __PACKAGE__->make_manager_methods('accounts');
 1;

@@ -19,16 +19,16 @@ rserver('localhost', '1', $rtypes);
 
 createresources($rtypes, $servers); 
 createappservers('localhost', '1');
-createuser('test1');
-createuser('test2');
+createaccount('test1');
+createaccount('test2');
 #end main
 
 
 ##########################################################################################33
 #begin subs
-sub createuser{
+sub createaccount{
 my $un = shift;
-my $u = User->new(username => $un);
+my $u = Account->new(accountname => $un);
 $u->save;
 }
 
@@ -106,11 +106,6 @@ sub rserver{
 		#load each resourceid using its name
 		my $r = Resourcetype->new(resource_type_name => $item);
 		$r->load;
-		#insert new XR record associating this serverid with the resourceid
-		my $xr = Resourceservertypexr->new(resourceserver_id => $p->resourceserver_id,
-						  resource_type_id => $r->resource_type_id
-		); 
-		$xr->save;
 	}
 }
 
