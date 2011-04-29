@@ -1,7 +1,8 @@
 #!/usr/bin/perl 
 use strict;
 use warnings;
-#This is a test program to try out loading values into the DB using Rose::DB:Object methods rather than writing SQL. So far this funtionality works, with each table name as it's own object defined in 'Provisioner.pm'
+#Each table's name has its own object defined in 'Provisioner.pm'
+#This program loads initial DB values
 
 #Our Rose::Db schema map as well as other object definitions.
 use My::Provisioner;
@@ -19,8 +20,12 @@ rserver('localhost', '1', $rtypes);
 
 createresources($rtypes, $servers); 
 createappservers('localhost', '1');
-createaccount('test1');
-createaccount('test2');
+for (my $i =1; $i < 10; $i++){
+	 createaccount('cpwork0' . $i);
+}
+for (my $i =10; $i <= 40; $i++){
+	 createaccount('cpwork'. $i);
+}
 #end main
 
 
