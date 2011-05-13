@@ -14,31 +14,49 @@ my ( $opt );
 
 GetOptions(
     \%{$opt},
-    
-    'account=s',
+   
+    'type=s',       # Type of object to provision (account, appinstance, threadpack)
+    'account=s',    # Account to provision or attach object to
+
     'help'
 );
 
-if ( !$opt->{'account'} || $opt->{'help'} ) { showUsage(); }
+if ( !$opt->{'type'} || !$opt->{'account'} || $opt->{'help'} ) { showUsage(); }
 
 my $u = Account->new( accountname => $opt->{'account'} );
 
-unless ( $u->load( speculative => 1 ) ) {
-    die "Error: no such account '$opt->{'account'}' can be found.\n";
+for ( lc( $opt->{'type'} ) ) {
+    /account/ && do {
+        if ( $u->load( speculative => 1 ) ) {
+            die "Error: account '$opt->{'account'}' already exists.\n";
+        }
+
+        $u->save();
+
+        print "Created account '$opt->{'account'}'.\n";
+        exit();
+    };
+
+    /appinstance/ && do {
+        unless ( $u->load( speculative => 1 ) ) {
+            die "Error: no such account '$opt->{'account'}' can be found.\n";
+        }
+
+        my $threads = '1';
+
+        my $as = getAppServer($threads);
+        my $ai = createAI( $u->account_id );
+        addResourceToAI( [ 'mysql', 'memcached' ], $ai, $opt->{'account'} );
+        my $tp = createTP( $ai, $threads, $as );
+        attachAITP( $ai, $tp );
+
+        print "APPInstance = $ai, attached to ThreadPack = $tp for account $opt->{'account'} with $threads thread(s) on appserver #$as\n";
+        exit();
+    };
+
+    print "Error: type '$opt->{'type'}' not recognized.\n";
+    showUsage();
 }
-
-
-
-my $threads = '1';
-
-my $as = getAppServer($threads);
-my $ai = createAI( $u->account_id );
-addResourceToAI( [ 'mysql', 'memcached' ], $ai, $opt->{'account'} );
-my $tp = createTP( $ai, $threads, $as );
-attachAITP( $ai, $tp );
-
-print
-"APPInstance = $ai, attached to ThreadPack = $tp for account $opt->{'account'} with $threads thread(s) on appserver #$as\n";
 
 
 
@@ -186,7 +204,8 @@ sub createAI {
 
 sub showUsage {
     print
-        "Usage: provision.pl -a <accountname> (creates new default appinstance)\n";
+        "Type 'perldoc provision.pl' for more options and information.\n\n"
+      . "Usage: provision.pl -t <type> -a <accountname> ...\n";
 
     exit();
 }
