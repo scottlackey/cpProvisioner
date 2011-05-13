@@ -14,9 +14,11 @@ my ( $opt );
 
 GetOptions(
     \%{$opt},
-   
+
     'type=s',       # Type of object to provision (account, appinstance, threadpack)
     'account=s',    # Account to provision or attach object to
+    
+    'instance=s',   # Appinstance to connect threadpack to
 
     'help'
 );
@@ -37,20 +39,48 @@ for ( lc( $opt->{'type'} ) ) {
         exit();
     };
 
-    /appinstance/ && do {
+    /appinstance/ || /threadpack/ && do {
         unless ( $u->load( speculative => 1 ) ) {
             die "Error: no such account '$opt->{'account'}' can be found.\n";
         }
+    };
 
-        my $threads = '1';
+    /appinstance/ && do {
+        # Find an appserver
+        my $as = getAppServer( '1' );
 
-        my $as = getAppServer($threads);
+        # Create the appinstance
         my $ai = createAI( $u->account_id );
         addResourceToAI( [ 'mysql', 'memcached' ], $ai, $opt->{'account'} );
-        my $tp = createTP( $ai, $threads, $as );
+
+        # Attach an initial threadpack to the appinstance
+        my $tp = createTP( $ai, '1', $as );
         attachAITP( $ai, $tp );
 
-        print "APPInstance = $ai, attached to ThreadPack = $tp for account $opt->{'account'} with $threads thread(s) on appserver #$as\n";
+        print "Created appinstnace '$ai' attached to threadpack '$tp' for account '$opt->{'account'}' with '1' thread on appserver '$as'.\n";
+        exit();
+    };
+
+    /threadpack/ && do {
+        if ( !$opt->{'instance'} ) {
+            die "Error: no appinstance specified.\n";
+        }
+
+        my $ai = Appinstance->new( appinstance_id => $opt->{'instance'} );
+
+        # Check that appinstance exists
+        unless ( $ai->load( speculative => 1 ) ) {
+            die "Error: no such appinstance '$opt->{'instance'}' can be found.\n";
+        }
+
+        # Find an appserver
+        my $as = getAppServer( '1' );
+
+        # Create and attach the threadpack
+        my $tp = createTP( $opt->{'instance'}, '1', $as );
+        attachAITP( $opt->{'instance'}, $tp );
+
+        print "Added threadpack '$tp' to appinstance '$opt->{'instance'}' for account '$opt->{'account'}' with '1' thread on appserver '1'.\n";
         exit();
     };
 
