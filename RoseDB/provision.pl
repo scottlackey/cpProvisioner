@@ -10,33 +10,35 @@ use strict;
 
 
 
-my %Opts;
-GetOptions( \%Opts, 'new|n', 'help|h', 'account|a=s', );
-my $new     = $Opts{'new'};
-my $help    = $Opts{'help'};
-my $account = $Opts{'account'};
+my ( $opt );
 
-#validate
-my $usage =
-"Usage: provision.pl -n -a <accountname>  (creates new default appinstance)\n";
-if ($help) { die $usage }
-die $usage unless ($account);
+GetOptions(
+    \%{$opt},
+    
+    'account=s',
+    'help'
+);
 
-my $u = Account->new( accountname => $account );
+if ( !$opt->{'account'} || $opt->{'help'} ) { showUsage(); }
+
+my $u = Account->new( accountname => $opt->{'account'} );
+
 unless ( $u->load( speculative => 1 ) ) {
-    die "No such account $account can be found\n";
+    die "Error: no such account '$opt->{'account'}' can be found.\n";
 }
+
+
 
 my $threads = '1';
 
 my $as = getAppServer($threads);
 my $ai = createAI( $u->account_id );
-addResourceToAI( [ 'mysql', 'memcached' ], $ai, $account );
+addResourceToAI( [ 'mysql', 'memcached' ], $ai, $opt->{'account'} );
 my $tp = createTP( $ai, $threads, $as );
 attachAITP( $ai, $tp );
 
 print
-"APPInstance = $ai, attached to ThreadPack = $tp for account $account with $threads thread(s) on appserver #$as\n";
+"APPInstance = $ai, attached to ThreadPack = $tp for account $opt->{'account'} with $threads thread(s) on appserver #$as\n";
 
 
 
@@ -178,5 +180,14 @@ sub createAI {
     );
     $ai->save;
     return $ai->appinstance_id;
+}
+
+
+
+sub showUsage {
+    print
+        "Usage: provision.pl -a <accountname> (creates new default appinstance)\n";
+
+    exit();
 }
 
