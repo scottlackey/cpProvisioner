@@ -1,12 +1,14 @@
 #!/usr/bin/perl
 
-use warnings;
-use strict;
-use Getopt::Long;
-
-#Our Rose::Db schema map as well as other object definitions.
 use My::Provisioner;
 use My::Manager;
+
+use Getopt::Long;
+
+use warnings;
+use strict;
+
+
 
 my %Opts;
 GetOptions( \%Opts, 'new|n', 'help|h', 'account|a=s', );
@@ -36,9 +38,7 @@ attachAITP( $ai, $tp );
 print
 "APPInstance = $ai, attached to ThreadPack = $tp for account $account with $threads thread(s) on appserver #$as\n";
 
-#end main
-#subs
-#################################################################################################
+
 
 # Attaches a TP to an AI, and makes it live.
 sub attachAITP {
@@ -63,6 +63,8 @@ sub attachAITP {
     $ai->is_live('1');
     $ai->save;
 }
+
+
 
 # Finds and locks a given resource_type and returns the resource_id
 sub findRes {
@@ -99,6 +101,8 @@ sub findRes {
     return $resource->resource_id;
 }
 
+
+
 #adds a list of resourcetypes to an appinstance by updating the ResourceAccess table
 sub addResourceToAI {
     my ( $rtypes, $ai, $account ) = @_;
@@ -128,6 +132,8 @@ sub addResourceToAI {
     }
 }
 
+
+
 #Check for a viable Appserver that has enough threads available, or exit with error
 sub getAppServer {
     my $threads = shift;
@@ -146,6 +152,8 @@ sub getAppServer {
     return $appserverid;
 }
 
+
+
 #assuming a valid AppInstance, Threadcount and AppServer have been defined, make a threadpack
 sub createTP {
     my ( $ai, $tc, $as ) = @_;
@@ -158,6 +166,8 @@ sub createTP {
     $tp->save;
     return $tp->threadpack_id;
 }
+
+
 
 #create a new AppInstance and associate it with the accountid defined at the command line
 sub createAI {
