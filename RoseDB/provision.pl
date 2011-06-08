@@ -14,12 +14,9 @@ my ( $opt );
 
 GetOptions(
     \%{$opt},
-
     'type=s',       # Type of object to provision (account, appinstance, threadpack)
     'account=s',    # Account to provision or attach object to
-    
     'instance=s',   # Appinstance to connect threadpack to
-
     'help'
 );
 
@@ -230,13 +227,10 @@ sub createAI {
     return $ai->appinstance_id;
 }
 
-
-
 sub showUsage {
     print
         "Type 'perldoc provision.pl' for more options and information.\n\n"
       . "Usage: provision.pl -t <type> -a <accountname> ...\n";
-
     exit();
 }
 

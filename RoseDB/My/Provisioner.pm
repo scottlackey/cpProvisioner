@@ -70,4 +70,5 @@ package Account;
     __PACKAGE__->meta->table('account');
     __PACKAGE__->meta->auto_initialize;
     __PACKAGE__->meta->make_manager_class('account');
+
 1;

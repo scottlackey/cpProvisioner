@@ -1,0 +1,3 @@
+73.192.185.228 is the host; log in as user bitpusher with the usual password
+the chroot /home/cpwork03/chroot and user cpwork03 are probably the best model 16:03
+still very rough
